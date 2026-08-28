@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EduGeometri - Petualangan Bentuk!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #ff6b6b; 
+            --secondary: #4dadf7;
+            --success: #51cf66; 
+            --warning: #fcc419;
+            --danger: #ff8787;
+            --purple: #b47cfb;
+            --bg-grad: linear-gradient(180deg, #e7f5ff 0%, #e3fafc 100%); 
+            --card-bg: #ffffff; 
+        }
+        
+        * { 
+            box-sizing: border-box; 
+            font-family: 'Fredoka', sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body { 
+            background: var(--bg-grad); 
+            margin: 0; 
+            padding: 12px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container { 
+            width: 100%; 
+            max-width: 420px; 
+            background: var(--card-bg); 
+            border-radius: 32px; 
+            border: 6px solid #4d4d4d; 
+            box-shadow: 0 12px 0 #333333, 0 20px 25px rgba(0,0,0,0.15); 
+            padding: 20px; 
+            position: relative;
+            min-height: 580px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-game {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        h2 { 
+            color: #212529; 
+            margin: 0; 
+            font-size: 1.7rem; 
+            text-shadow: 2px 2px 0px #f1f3f5;
+        }
+        .subtitle {
+            font-size: 0.9rem;
+            color: #868e96;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        /* --- HALAMAN HOME: GRID MENU UTAMA --- */
+        .home-page {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            overflow-y: auto;
+            padding-bottom: 10px;
+            flex: 1;
+        }
+
+        .shape-card {
+            background: #ffffff;
+            border: 3px solid #4d4d4d;
+            border-radius: 20px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #4d4d4d;
+            transition: all 0.1s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .shape-card:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #4d4d4d;
+        }
+        .shape-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.1));
+        }
+        .shape-card .name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #343a40;
+        }
+
+        /* Variasi Warna Card Biar Ramai */
+        .card-1 { background: #fff0f6; }
+        .card-2 { background: #eef2ff; }
+        .card-3 { background: #e6fcf5; }
+        .card-4 { background: #fff9db; }
+        .card-5 { background: #f3f0ff; }
+        .card-6 { background: #fff5f5; }
+
+        /* --- HALAMAN HITUNG (Secara default tersembunyi) --- */
+        .solver-page {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .current-shape-banner {
+            background: #fff9db;
+            border: 3px solid #4d4d4d;
+            border-radius: 18px;
+            padding: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 0 #4d4d4d;
+        }
+
+        #pi-container { 
+            margin-bottom: 15px; 
+            padding: 10px; 
+            background: #e8f7ff; 
+            border-radius: 16px; 
+            border: 3px dashed var(--secondary); 
+        }
+        .pi-select {
+            width: 100%; padding: 10px; border-radius: 12px; border: 2px solid #4d4d4d;
+            font-weight: 700; font-size: 1rem; background: white;
+        }
+        
+        .input-group { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            margin-bottom: 15px; 
+        }
+        .field-box { display: flex; flex-direction: column; }
+        .label-text { font-size: 0.8rem; font-weight: 700; color: #495057; margin-bottom: 4px; margin-left: 4px;}
+        
+        .input-box { 
+            width: 100%; padding: 12px; border-radius: 16px; border: 3px solid #cbd5e1; 
+            text-align: center; font-weight: 700; font-size: 1.2rem; color: #495057;
+            background: #f8fafc; box-shadow: inset 0 4px 0 rgba(0,0,0,0.05);
+        }
+        .input-box:focus { border-color: var(--secondary); outline: none; background: #fff; }
+        
+        .input-box.calculated { 
+            background: #ebfbee; border-color: var(--success); color: #2b8a3e; 
+            animation: bounce 0.5s ease-out; box-shadow: 0 0 10px rgba(81, 207, 102, 0.3);
+        }
+
+        @keyframes bounce {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.1) translateY(-4px); }
+            50% { transform: scale(0.95) translateY(0); }
+            100% { transform: scale(1); }
+        }
+
+        .btn-area { display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px; margin-top: auto; }
+        button { 
+            padding: 14px; border-radius: 18px; border: 3px solid #333333; 
+            font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: all 0.1s; 
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+        }
+        .btn-calc { background: var(--success); color: white; box-shadow: 0 6px 0 #2b8a3e; }
+        .btn-calc:active { transform: translateY(4px); box-shadow: 0 2px 0 #2b8a3e; }
+        .btn-reset { background: var(--warning); color: #212529; box-shadow: 0 6px 0 #d9a406; }
+        .btn-reset:active { transform: translateY(4px); box-shadow: 0 2px 0 #d9a406; }
+        
+        .btn-back {
+            grid-column: span 2; background: var(--danger); color: white; box-shadow: 0 6px 0 #c92a2a; margin-top: 8px;
+        }
+        .btn-back:active { transform: translateY(4px); box-shadow: 0 2px 0 #c92a2a; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <!-- HALAMAN UTAMA (HOME) -->
+    <div id="page-home" class="home-page">
+        <div class="header-game" style="grid-column: span 2;">
+            <h2>Kalkulator Bangun Datar</h2>
+            <div class="subtitle">Pilih bangun datar yang ingin kamu hitung!</div>
+        </div>
+        
+        <!-- Grid Tombol Karakter Bangun Datar -->
+        <div class="shape-card card-1" onclick="selectShape('persegi')">
+            <img class="icon" src="ikon/persegi.png" height="80px" alt="Persegi">
+            <span class="name">Persegi</span>
+        </div>
+        <div class="shape-card card-2" onclick="selectShape('persegipanjang')">
+            <img class="icon" src="ikon/persegipanjang.png" height="80px" alt="Persegi Panjang">
+            <span class="name">Persegi Panjang</span>
+        </div>
+        <div class="shape-card card-3" onclick="selectShape('lingkaran')">
+            <img class="icon" src="ikon/lingkaran.png" height="80px" alt="Lingkaran">
+            <span class="name">Lingkaran</span>
+        </div>
+        <div class="shape-card card-4" onclick="selectShape('segitiga_sikusiku')">
+            <img class="icon" src="ikon/segitiga_sikusiku.png" height="80px" alt="Segitiga Siku">
+            <span class="name">Segitiga Siku</span>
+        </div>
+        <div class="shape-card card-5" onclick="selectShape('segitiga_samakaki')">
+            <img class="icon" src="ikon/segitiga_samakaki.png" height="80px" alt="Segitiga Sama Kaki">
+            <span class="name">Segitiga Sama Kaki</span>
+        </div>
+        <div class="shape-card card-6" onclick="selectShape('segitiga_samasisi')">
+            <img class="icon" src="ikon/segitiga_samasisi.png" height="80px" alt="Segitiga Sama Sisi">
+            <span class="name">Segitiga Sama Sisi</span>
+        </div>
+        <div class="shape-card card-1" onclick="selectShape('jajargenjang')">
+            <img class="icon" src="ikon/jajargenjang.png" height="80px" alt="Jajar Genjang">
+            <span class="name">Jajar Genjang</span>
+        </div>
+        <div class="shape-card card-2" onclick="selectShape('trapesium_samakaki')">
+            <img class="icon" src="ikon/trapesium_samakaki.png" height="80px" alt="Trapesium Sama Kaki">
+            <span class="name">Trapesium Sama Kaki</span>
+        </div>
+        <div class="shape-card card-3" onclick="selectShape('trapesium_sikusiku')">
+            <img class="icon" src="ikon/trapesium_sikusiku.png" height="80px" alt="Trapesium Siku">
+            <span class="name">Trapesium Siku</span>
+        </div>
+        <div class="shape-card card-4" onclick="selectShape('trapesium_sembarang')">
+            <img class="icon" src="ikon/trapesium_sembarang.png" height="80px" alt="Trapesium Sembarang">
+            <span class="name">Trapesium Sembarang</span>
+        </div>
+        <div class="shape-card card-5" onclick="selectShape('belahketupat')">
+            <img class="icon" src="ikon/belahketupat.png" height="80px" alt="Belah Ketupat">
+            <span class="name">Belah Ketupat</span>
+        </div>
+        <div class="shape-card card-6" onclick="selectShape('layanglayang')">
+            <img class="icon" src="ikon/layanglayang.png" height="80px" alt="Layang-Layang">
+            <span class="name">Layang-Layang</span>
+        </div>
+    </div>
+
+    <!-- HALAMAN KALKULATOR (SOLVER) -->
+    <div id="page-solver" class="solver-page">
+        <div class="current-shape-banner">
+            <span id="runtime-icon"></span>
+            <span id="runtime-title">Nama Bangun</span>
+        </div>
+
+        <div id="pi-container">
+            <span class="label-text">Angka Ajaib Pi (π):</span>
+            <select id="pi-value" class="pi-select">
+                <option value="math">🤖 Otomatis (Sistem)</option>
+                <option value="3.14">🍰 3.14</option>
+                <option value="22/7">🍕 22/7</option>
+            </select>
+        </div>
+
+        <!-- Wadah Kotak Input Masukan -->
+        <div id="dynamic-fields" class="input-group"></div>
+
+        <div class="btn-area">
+            <button class="btn-reset" onclick="resetFields()">🔄 Bersihkan</button>
+            <button class="btn-calc" onclick="solve()">🚀 Hitung!</button>
+            <button class="btn-back" onclick="goHome()">🏠 Menu Utama</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let activeShape = '';
+
+    const SHAPES = {
+        persegi: { icon: '', title: 'Persegi', fields: { s: 'Sisi (s)', L: 'Luas ⭐', K: 'Keliling 💫', d: 'Diagonal' } },
+        persegipanjang: { icon: '', title: 'Persegi Panjang', fields: { p: 'Panjang', l: 'Lebar', L: 'Luas ⭐', K: 'Keliling 💫' } },
+        lingkaran: { icon: '', title: 'Lingkaran', fields: { r: 'Jari-jari (r)', d: 'Diameter (d)', L: 'Luas ⭐', K: 'Keliling 💫' } },
+        segitiga_sikusiku: { icon: '', title: 'Segitiga Siku', fields: { a: 'Alas (a)', t: 'Tinggi (t)', m: 'Sisi Miring', L: 'Luas ⭐', K: 'Keliling 💫' } },
+        segitiga_samakaki: { icon: '', title: 'Segitiga Kaki', fields: { a: 'Alas (a)', t: 'Tinggi (t)', m: 'Sisi Miring', L: 'Luas ⭐', K: 'Keliling 💫' } },
+        segitiga_samasisi: { icon: '', title: 'Segitiga Sisi', fields: { s: 'Sisi (s)', t: 'Tinggi (t)', L: 'Luas ⭐', K: 'Keliling 💫' } },
+        jajargenjang: { icon: '', title: 'Jajar Genjang', fields: { a: 'Alas (a)', t: 'Tinggi (t)', sm: 'Sisi Miring', L: 'Luas ⭐', K: 'Keliling 💫' } },
+        trapesium_samakaki: { icon: '', title: 'Trapesium Kaki', fields: { a: 'Sisi Atas', b: 'Sisi Bawah', t: 'Tinggi', L: 'Luas ⭐', K: 'Keliling 💫' } },
+        trapesium_sikusiku: { icon: '', title: 'Trapesium Siku', fields: { a: 'Sisi Atas', b: 'Sisi Bawah', t: 'Tinggi', L: 'Luas ⭐', K: 'Keliling 💫' } },
+        trapesium_sembarang: { icon: '', title: 'Trap. Sembarang', fields: { a: 'Sisi Atas', b: 'Sisi Bawah', t: 'Tinggi', s3: 'Sisi Kiri', s4: 'Sisi Kanan', L: 'Luas ⭐', K: 'Keliling 💫' } },
+        belahketupat: { icon: '', title: 'Belah Ketupat', fields: { d1: 'Diagonal 1', d2: 'Diagonal 2', s: 'Sisi (s)', L: 'Luas ⭐', K: 'Keliling 💫' } },
+        layanglayang: { icon: '', title: 'Layang-Layang', fields: { d1: 'Diagonal 1', d2: 'Diagonal 2', s1: 'Sisi Pendek', s2: 'Sisi Panjang', L: 'Luas ⭐', K: 'Keliling 💫' } }
+    };
+
+    // Fungsi Pindah Halaman ke Tempat Berhitung
+    function selectShape(shapeKey) {
+        activeShape = shapeKey;
+        document.getElementById('page-home').style.display = 'none';
+        document.getElementById('page-solver').style.display = 'flex';
+        
+        // Atur Judul Banner Atas
+        document.getElementById('runtime-icon').innerText = SHAPES[shapeKey].icon;
+        document.getElementById('runtime-title').innerText = SHAPES[shapeKey].title;
+        
+        renderFields();
+    }
+
+    // Fungsi Kembali Ke Home
+    function goHome() {
+        document.getElementById('page-solver').style.display = 'none';
+        document.getElementById('page-home').style.display = 'grid';
+    }
+
+    function renderFields() {
+        const container = document.getElementById('dynamic-fields');
+        const piContainer = document.getElementById('pi-container');
+        container.innerHTML = '';
+        piContainer.style.display = (activeShape === 'lingkaran') ? 'block' : 'none';
+
+        const fields = SHAPES[activeShape].fields;
+        for (let key in fields) {
+            container.innerHTML += `
+                <div class="field-box">
+                    <span class="label-text">${fields[key]}</span>
+                    <input type="number" pattern="[0-9]*" inputmode="decimal" id="val-${key}" class="input-box" placeholder="?">
+                </div>
+            `;
+        }
+    }
+
+    function getV(id) {
+        const el = document.getElementById('val-' + id);
+        return el && el.value !== '' ? parseFloat(el.value) : null;
+    }
+
+    function setV(id, val) {
+        const el = document.getElementById('val-' + id);
+        if (el && el.value === '') {
+            el.value = Number.isInteger(val) ? val : parseFloat(val.toFixed(2));
+            el.classList.add('calculated');
+        }
+    }
+
+    function resetFields() { renderFields(); }
+
+    function solve() {
+        document.querySelectorAll('.input-box').forEach(i => i.classList.remove('calculated'));
+
+        // 1. Persegi
+        if (activeShape === 'persegi') {
+            let s = getV('s'), L = getV('L'), K = getV('K'), d = getV('d');
+            if (L) s = Math.sqrt(L); else if (K) s = K / 4; else if (d) s = d / Math.sqrt(2);
+            if (s) { setV('s', s); setV('L', s*s); setV('K', 4*s); setV('d', s*Math.sqrt(2)); }
+        } 
+        // 2. Persegi Panjang
+        else if (activeShape === 'persegipanjang') {
+            let p = getV('p'), l = getV('l'), L = getV('L'), K = getV('K');
+            if (L && p) l = L/p; 
+            else if (L && l) p = L/l; 
+            else if (K && p) l = (K/2)-p; 
+            else if (K && l) p = (K/2)-l;
+            else if (K && L) {
+                p = (K / 4) + Math.sqrt(((K * K) / 16) - L);
+                l = (K / 4) - Math.sqrt(((K * K) / 16) - L);
+            }
+            if (p && l) { setV('p', p); setV('l', l); setV('L', p*l); setV('K', 2*(p+l)); }
+        }
+        // 3. Lingkaran
+        else if (activeShape === 'lingkaran') {
+            let r = getV('r'), d = getV('d'), L = getV('L'), K = getV('K');
+            const piInputValue = document.getElementById('pi-value').value;
+            const PI = (piInputValue === '3.14') ? 3.14 : (piInputValue === '22/7' ? 22/7 : Math.PI);
+            if (d) r = d/2; else if (L) r = Math.sqrt(L/PI); else if (K) r = K/(2*PI);
+            if (r) { setV('r', r); setV('d', r*2); setV('L', PI*r*r); setV('K', 2*PI*r); }
+        }
+        // 4. Jajar Genjang
+        else if (activeShape === 'jajargenjang') {
+            let a = getV('a'), t = getV('t'), sm = getV('sm'), L = getV('L'), K = getV('K');
+            if (L && a) t = L/a; else if (L && t) a = L/t;
+            if (K && a) sm = (K/2)-a; else if (K && sm) a = (K/2)-sm;
+            if (a && t && sm) { setV('a', a); setV('t', t); setV('sm', sm); setV('L', a*t); setV('K', 2*(a+sm)); }
+            else if (a && t) { setV('a', a); setV('t', t); setV('L', a*t); }
+            else if (a && sm) { setV('a', a); setV('sm', sm); setV('K', 2*(a+sm)); }
+        }
+        // 5. Trapesium Sama Kaki
+        else if (activeShape === 'trapesium_samakaki') {
+            let a = getV('a'), b = getV('b'), t = getV('t'), L = getV('L'), K = getV('K');
+            if (L && a && b) t = (2*L)/(a+b);
+            if (a && b && t) {
+                let sisiMiring = Math.sqrt(Math.pow((Math.abs(b-a)/2), 2) + t*t);
+                setV('a', a); setV('b', b); setV('t', t); setV('L', 0.5*(a+b)*t); setV('K', a+b+(2*sisiMiring));
+            }
+        }
+        // 6. Trapesium Siku-siku
+        else if (activeShape === 'trapesium_sikusiku') {
+            let a = getV('a'), b = getV('b'), t = getV('t'), L = getV('L'), K = getV('K');
+            if (L && a && b) t = (2*L)/(a+b);
+            if (a && b && t) {
+                let sisiMiring = Math.sqrt(Math.pow((Math.abs(b-a)), 2) + t*t);
+                setV('a', a); setV('b', b); setV('t', t); setV('L', 0.5*(a+b)*t); setV('K', a+b+sisiMiring+t);
+            }
+        }
+        // 7. Trapesium Sembarang
+        else if (activeShape === 'trapesium_sembarang') {
+            let a = getV('a'), b = getV('b'), t = getV('t'), s3 = getV('s3'), s4 = getV('s4'), L = getV('L'), K = getV('K');
+            if (L && a && b) t = (2*L)/(a+b);
+            if (a && b && t) setV('L', 0.5*(a+b)*t);
+            if (a && b && s3 && s4) { setV('K', a+b+s3+s4); if(t) setV('L', 0.5*(a+b)*t); }
+        }
+        // 8. Belah Ketupat
+        else if (activeShape === 'belahketupat') {
+            let d1 = getV('d1'), d2 = getV('d2'), s = getV('s'), L = getV('L'), K = getV('K');
+            if (K) s = K/4;
+            if (L && d1) d2 = (2*L)/d1; else if (L && d2) d1 = (2*L)/d2;
+            if (d1 && d2) { s = Math.sqrt(Math.pow(d1/2, 2) + Math.pow(d2/2, 2)); }
+            if (s && d1 && !d2) d2 = 2 * Math.sqrt(s*s - Math.pow(d1/2, 2));
+            if (s && d2 && !d1) d1 = 2 * Math.sqrt(s*s - Math.pow(d2/2, 2));
+            if (s) { setV('s', s); setV('K', 4*s); }
+            if (d1 && d2) { setV('d1', d1); setV('d2', d2); setV('L', 0.5*d1*d2); }
+        }
+        // 9. Layang-Layang
+        else if (activeShape === 'layanglayang') {
+            let d1 = getV('d1'), d2 = getV('d2'), s1 = getV('s1'), s2 = getV('s2'), L = getV('L'), K = getV('K');
+            if (L && d1) d2 = (2*L)/d1; else if (L && d2) d1 = (2*L)/d2;
+            if (d1 && d2) setV('L', 0.5*d1*d2);
+            if (s1 && s2) setV('K', 2*(s1+s2));
+            if (K && s1) s2 = (K/2)-s1; else if (K && s2) s1 = (K/2)-s2;
+            if (s1 && s2) { setV('s1', s1); setV('s2', s2); setV('K', 2*(s1+s2)); }
+        }
+        // 10. Segitiga Siku-Siku
+        else if (activeShape === 'segitiga_sikusiku') {
+            let a = getV('a'), t = getV('t'), m = getV('m'), L = getV('L'), K = getV('K');
+            if (L && a) t = (2*L)/a; else if (L && t) a = (2*L)/t;
+            if (a && t) m = Math.sqrt(a*a + t*t); else if (a && m) t = Math.sqrt(m*m - a*a); else if (t && m) a = Math.sqrt(m*m - t*t);
+            if (a && t && m) { setV('a', a); setV('t', t); setV('m', m); setV('L', 0.5*a*t); setV('K', a+t+m); }
+        }
+        // 11. Segitiga Samakaki
+        else if (activeShape === 'segitiga_samakaki') {
+            let a = getV('a'), t = getV('t'), m = getV('m'), L = getV('L'), K = getV('K');
+            if (L && a) t = (2*L)/a; else if (L && t) a = (2*L)/t;
+            if (a && t) m = Math.sqrt((a*a/4) + t*t); else if (a && m) t = Math.sqrt(m*m - (a*a/4)); else if (t && m) a = Math.sqrt(m*m - t*t)*2;
+            if (a && t && m) { setV('a', a); setV('t', t); setV('m', m); setV('L', 0.5*a*t); setV('K', a+(2*m)); }
+        }
+        // 12. Segitiga Samasisi
+        else if (activeShape === 'segitiga_samasisi') {
+            let s = getV('s'), t = getV('t'), L = getV('L'), K = getV('K');
+            if (t) s = 2 * t / Math.sqrt(3);
+            else if (L) s = Math.sqrt((4*L)/Math.sqrt(3));
+            else if (K) s = K/3;
+            if (s) { setV('s', s); setV('t', (s/2)*Math.sqrt(3)); setV('L', (s*s/4)*Math.sqrt(3)); setV('K', 3*s); }
+        }
+    }
+</script>
+</body>
+</html>
